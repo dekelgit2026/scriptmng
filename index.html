@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>כלבים של אף אחד — ניהול תסריט</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --panel:#fffdf8; --ink:#1d1b18; --muted:#6f6a60; --line:#e2ddd1;
+  --accent:#c2410c; --accent-soft:#fde7d9;
+  --ok:#2f7d4f; --ok-soft:#dcf0e3; --warn:#a16207; --warn-soft:#fbefc9; --none:#9a948a; --none-soft:#ece8df;
+  --best:#b45309;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#16140f; --panel:#1f1c16; --ink:#efe9dc; --muted:#a39b8c; --line:#353026;
+    --accent:#f97316; --accent-soft:#3b2414; --ok:#5cc58a; --ok-soft:#173226; --warn:#e2b443; --warn-soft:#3a2f12;
+    --none:#8a8376; --none-soft:#2a261f; --best:#f5a524; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Heebo,system-ui,sans-serif;font-size:15px;line-height:1.5}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+header{padding:28px 28px 0;max-width:1180px;margin:0 auto}
+.kicker{font-size:12px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+h1{font-size:34px;font-weight:900;margin:2px 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0}
+.refs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}.refs a{display:block;text-decoration:none;color:var(--muted);font-size:12px}.refs img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block;margin-bottom:3px}
+.cont-g{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:14px}.cont-h{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px}@media(max-width:600px){.cont-g{grid-template-columns:1fr}}
+nav{display:flex;gap:6px;margin:20px 0 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav a{padding:10px 14px;color:var(--muted);text-decoration:none;font-weight:500;border-bottom:3px solid transparent;margin-bottom:-1px}
+nav a.on{color:var(--ink);border-color:var(--accent)}
+main{max-width:1180px;margin:0 auto;padding:22px 28px 60px}
+.note{background:var(--warn-soft);color:var(--ink);padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:14px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.kpi .v{font-size:32px;font-weight:900;line-height:1.1}
+.kpi .l{color:var(--muted);font-size:13px}
+.bar{height:12px;border-radius:6px;background:var(--none-soft);overflow:hidden;display:flex;margin:10px 0 6px}
+.bar span{display:block;height:100%}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-inline-end:6px}
+h2{font-size:18px;margin:26px 0 10px}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px}
+.chip{border-radius:8px;padding:6px 0;text-align:center;font-weight:700;cursor:pointer;border:1px solid transparent;font-size:14px}
+.st-not_shot{background:var(--none-soft);color:var(--none)}
+.st-partial{background:var(--warn-soft);color:var(--warn)}
+.st-shot{background:var(--ok-soft);color:var(--ok)}
+.chip:hover{border-color:var(--ink)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.filters input,.filters select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.filters input{min-width:220px}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:700;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover{background:var(--accent-soft)}
+.num{font-weight:900;font-size:16px;width:46px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.chars{color:var(--muted);font-size:13px}
+.best{color:var(--best);font-weight:700}
+.star{color:var(--best)}
+.empty{color:var(--muted);text-align:center;padding:30px}
+.day{margin-bottom:14px}
+.day h3{margin:0 0 4px;font-size:17px}
+.day .meta{color:var(--muted);font-size:13px;margin-bottom:10px}
+.scenes-line{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.scenes-line .chip{padding:3px 10px;font-size:13px}
+dialog{border:0;border-radius:14px;padding:0;max-width:720px;width:92vw;background:var(--panel);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(20,16,10,.55)}
+.dlg-h{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.dlg-b{padding:16px 20px 22px}
+.x{background:none;border:0;font-size:22px;cursor:pointer;color:var(--muted)}
+.btn{font:inherit;font-weight:700;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+.status-msg{color:var(--muted);font-size:13px}
+.st-planned{background:transparent;color:#2563eb;border:1px dashed #2563eb}
+.toc{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);margin-bottom:16px}
+.sc{border-radius:12px;margin:0 0 18px;border:1px solid var(--line);background:var(--panel);overflow:hidden;scroll-margin-top:90px}
+.sc-h{display:flex;gap:10px;align-items:center;padding:10px 16px;font-weight:900;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.sc-h .n{font-size:18px;min-width:28px}
+.part{padding:14px 22px;border-inline-start:6px solid transparent}
+.part.shot{background:var(--ok-soft);border-color:var(--ok)}
+.part.partial{background:var(--warn-soft);border-color:var(--warn)}
+.part.planned{border-color:#2563eb}
+.part-l{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.ln-act{margin:6px 0}
+.ln-cue{text-align:center;font-weight:700;margin:12px 0 0}
+.ln-paren{text-align:center;font-style:italic;color:var(--muted)}
+.ln-dlg{max-width:520px;margin:0 auto 4px;text-align:center}
+.ln-gap{height:6px}
+.legend2{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:8px}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-inline-end:5px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.form label{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:4px}
+.form input,.form select,.form textarea{font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.form .wide{grid-column:1/-1}
+.form .chk{flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:14px}
+.btn2{font:inherit;font-weight:700;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+.btn-danger{color:#b91c1c;border-color:#fca5a5}
+.actions{display:flex;gap:8px;justify-content:flex-start;margin-top:14px;flex-wrap:wrap;align-items:center}
+.ebtn{background:none;border:0;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 6px}
+.ebtn:hover{color:var(--accent)}
+.toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.err{color:#b91c1c;font-size:13px}
+.drow{display:grid;grid-template-columns:70px 1fr 1fr 30px;gap:6px;margin-bottom:6px}
+@media (max-width:700px){ header,main{padding-left:16px;padding-right:16px} .hide-sm{display:none} h1{font-size:26px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">SCRIPT SUPERVISOR · דראפט 9</div>
+  <h1>כלבים של אף אחד</h1>
+  <p class="sub">קומדיית פשע שחורה · עמית רודרמן · מעקב צילומים, טייקים ובחירות לעריכה</p>
+  <nav id="nav">
+    <a href="#overview">סקירה</a>
+    <a href="#scenes">סצנות</a>
+    <a href="#days">ימי צילום</a>
+    <a href="#cont">המשכיות</a>
+    <a href="#editor">רשימה לעורך</a>
+  </nav>
+</header>
+<main id="app"><p class="status-msg">טוען…</p></main>
+
+<dialog id="dlg"><div class="dlg-h"><div id="dlgTitle"></div><button class="x" onclick="dlg.close()" aria-label="סגור">×</button></div><div class="dlg-b" id="dlgBody"></div></dialog>
+
+<script>
+const ST = {not_shot:"לא צולם", partial:"צולם חלקית", shot:"צולם"};
+const S = {scenes:[], days:[], takes:[], meta:[], loaded:{scenes:false,days:false,takes:false}, note:""};
+const $app = document.getElementById("app");
+const dlg = document.getElementById("dlg");
+let fScene = {q:"", st:"all", loc:"all"};
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function pill(st){st=st||"not_shot";return `<span class="pill st-${st}">${ST[st]||st}</span>`}
+function slug(sc){return `${esc(sc.ie)}. ${esc(sc.loc)} – ${esc(sc.time)}`}
+function castName(c){const m=(S.meta.find(x=>x._id==="cast")||{}).map||{};const base=String(c).replace(/\s*\(.*\)$/,"");return m[base]?`${c} (${m[base]})`:c}
+function takesFor(n){return S.takes.filter(t=>Number(t.scene)===Number(n)).sort((a,b)=>(a.day-b.day)||String(a.setup).localeCompare(String(b.setup))||(a.take-b.take))}
+function bestFor(n){return takesFor(n).filter(t=>t.best)}
+function daysFor(n){return S.days.filter(d=>(d.scenes||[]).some(x=>Number(x.num)===Number(n))).map(d=>d.day)}
+function takeLabel(t){return `${t.setup?esc(t.setup)+" · ":""}${t.take===undefined||t.take==="—"?"":(/^\d/.test(String(t.take))?"T":"")+esc(t.take)}${t.cam?" · מצלמה "+esc(t.cam):""}`}
+function takeMeta(t){return [t.card?`כרטיס ${esc(t.card)}`:"", t.rating?`ציון ${esc(t.rating)}`:"", t.part?`חלק ${esc(t.part)}`:"", t.coverage?esc(t.coverage):""].filter(Boolean).join(" · ")}
+
+function plannedDay(n){const d=S.days.find(d=>d.wip&&(d.planned||[]).map(Number).includes(Number(n)));return d?d.day:null}
+function effSt(s){const st=s.status||"not_shot"; return st==="not_shot"&&plannedDay(s.num)?"planned":st}
+let SCRIPT=null, scriptLoading=false;
+function loadScript(){ if(SCRIPT||scriptLoading) return; scriptLoading=true;
+  fetch("script.json").then(r=>r.json()).then(j=>{SCRIPT=j; if(view()==="script") render();}).catch(()=>{SCRIPT=[];render();}); }
+function lineHtml(x){ if(x.t==="gap") return '<div class="ln-gap"></div>'; return `<div class="ln-${x.t}">${esc(x.s)}</div>`; }
+function scriptView(){
+  loadScript();
+  if(!SCRIPT) return `<p class="status-msg">טוען את התסריט…</p>`;
+  const toc=`<div class="toc"><div class="strip">${S.scenes.map(s=>`<a class="chip st-${effSt(s)}" href="#script" data-jump="${s.num}" style="text-decoration:none">${s.num}</a>`).join("")}</div>
+   <div class="legend2"><span><i class="sw" style="background:var(--ok)"></i>צולם</span><span><i class="sw" style="background:var(--warn)"></i>צולם חלקית</span><span><i class="sw" style="border:1px dashed #2563eb"></i>מתוכנן להיום</span><span><i class="sw" style="background:var(--panel);border:1px solid var(--line)"></i>לא צולם</span></div></div>`;
+  return toc + SCRIPT.map(sc=>{
+    const s=S.scenes.find(x=>Number(x.num)===sc.num)||{}; const st=effSt(s);
+    const lines=[...(sc.pre?[...sc.pre,{t:"gap"}]:[]),...sc.lines];
+    let body;
+    if(s.parts&&s.parts.length){
+      const idx=s.parts.map(p=>p.from?lines.findIndex(l=>(l.s||"").includes(p.from)):0);
+      body=s.parts.map((p,i)=>{const a=Math.max(0,idx[i]); const b=i+1<idx.length&&idx[i+1]>0?idx[i+1]:lines.length;
+        return `<div class="part ${p.status||"not_shot"}"><div class="part-l">${esc(p.label)} · ${ST[p.status]||""}</div>${lines.slice(a,b).map(lineHtml).join("")}</div>`}).join("");
+    } else body=`<div class="part ${st}">${lines.map(lineHtml).join("")}</div>`;
+    const pd=plannedDay(sc.num);
+    return `<section class="sc" id="sc-${sc.num}"><div class="sc-h"><span class="n">${sc.num}</span><span>${esc(sc.head)}</span>
+      ${st==="planned"?`<span class="pill st-planned">מתוכנן — יום ${pd}</span>`:pill(s.status)}
+      ${bestFor(sc.num).length?`<span class="pill" style="background:var(--accent-soft);color:var(--best)">★ ${bestFor(sc.num).length} לעריכה</span>`:""}
+      <a href="#scenes" data-scene="${sc.num}" class="chars" style="margin-inline-start:auto">טייקים ›</a></div>${body}</section>`;
+  }).join("");
+}
+const CF={ok:["תקין","var(--ok)"],incomplete:["חסר השלמה","var(--warn)"],issue:["בעייתי / לטיפול","#d9534f"]};
+function cLines(t){return esc(t||"").split(/\n/).filter(x=>x.trim()).map(x=>`<div>${x}</div>`).join("")}
+function contBlock(s){const c=s.cont; if(!c) return "";
+  const f=CF[c.flag];
+  return `<div class="cont">${f?`<div class="chars" style="margin-bottom:6px"><i class="dot" style="background:${f[1]}"></i> ${f[0]} (סימון במאי)</div>`:""}
+  <div class="cont-g"><div><div class="cont-h">תחילת סצנה · אביזרים</div>${cLines(c.startProps)||"—"}</div><div><div class="cont-h">תחילת סצנה · אנרגיה וכיוונים</div>${cLines(c.startEnergy)||"—"}</div>
+  <div><div class="cont-h">סוף סצנה · אביזרים</div>${cLines(c.endProps)||"—"}</div><div><div class="cont-h">סוף סצנה · אנרגיה וכיוונים</div>${cLines(c.endEnergy)||"—"}</div></div>
+  ${c.missing?`<div class="note" style="margin:8px 0 0;background:#fdecea"><b>מה חסר:</b> ${esc(c.missing)}</div>`:""}
+  ${c.prep?`<div class="note" style="margin:8px 0 0;background:#fdecea"><b>לשים לב בצילום:</b> ${esc(c.prep)}</div>`:""}
+  ${(c.refs||[]).length?`<div class="cont-h" style="margin-top:10px">פריימים לרפרנס · כיווני מבט</div><div class="refs">${c.refs.map(r=>`<a href="${esc(r.src)}" target="_blank" rel="noopener"><img src="${esc(r.src)}" alt="${esc(r.cap||"")}" loading="lazy"><span>${esc(r.cap||"")}</span></a>`).join("")}</div>`:""}</div>`;}
+function contView(){
+  const rows=S.scenes.filter(s=>s.cont);
+  const miss=rows.filter(s=>s.cont.missing||s.cont.prep);
+  return `<p class="chars">התחקות המשכיות לפי סצנה: אביזרים, אנרגיה וכיווני מבט בתחילת ובסוף כל סצנה. הצבעים לפי הסימון בטבלה (גם של הבמאי). לחיצה על סצנה פותחת את הפרטים.</p>
+  <h2>מה חסר / לטיפול (${miss.length})</h2>
+  <table><thead><tr><th>#</th><th>סצנה</th><th>מה חסר</th></tr></thead><tbody>
+  ${miss.map(s=>`<tr class="click" data-scene="${s.num}"><td class="num"><i class="dot" style="background:${(CF[s.cont.flag]||[,"var(--none)"])[1]}"></i> ${s.num}</td><td>${slug(s)}</td><td>${esc(s.cont.missing||"")}${s.cont.prep?`<div class="chars"><b>לשים לב:</b> ${esc(s.cont.prep)}</div>`:""}</td></tr>`).join("")}
+  </tbody></table>
+  <h2>פירוט לפי סצנה</h2>
+  ${rows.map(s=>`<div class="card" style="margin-bottom:10px"><div class="click" data-scene="${s.num}" style="font-weight:800;margin-bottom:6px">סצנה ${s.num} · ${slug(s)}</div>${contBlock(s)}</div>`).join("")}`;
+}
+function view(){return (location.hash||"#overview").slice(1)}
+function render(){
+  const v=view();
+  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+v));
+  const pre = S.note?`<div class="note">${esc(S.note)}</div>`:"";
+  if(!S.loaded.scenes){ $app.innerHTML = pre+`<p class="status-msg">טוען נתונים…</p>`; return; }
+  if(!S.scenes.length){ $app.innerHTML = pre+`<div class="card empty">פירוק הסצנות עוד לא נטען.</div>`; return; }
+  $app.innerHTML = pre + ({overview,scenes:scenesView,days:daysView,editor:editorView,cont:contView}[v]||overview)();
+  bind();
+}
+
+function overview(){
+  const n=S.scenes.length, c={not_shot:0,partial:0,shot:0};
+  S.scenes.forEach(s=>c[s.status||"not_shot"]++);
+  const bestScenes = S.scenes.filter(s=>bestFor(s.num).length).length;
+  const pct=x=>Math.round(x/n*1000)/10;
+  const lastDay = [...S.days].sort((a,b)=>b.day-a.day)[0];
+  return `
+  <div class="grid kpis">
+    <div class="card kpi"><div class="v">${c.shot}<span class="chars"> / ${n}</span></div><div class="l">סצנות שצולמו במלואן</div></div>
+    <div class="card kpi"><div class="v">${c.partial}</div><div class="l">צולמו חלקית</div></div>
+    <div class="card kpi"><div class="v">${S.days.length}</div><div class="l">ימי צילום${lastDay?` · אחרון: יום ${esc(lastDay.day)}`:""}</div></div>
+    <div class="card kpi"><div class="v">${bestScenes}</div><div class="l">סצנות עם טייק נבחר לעריכה</div></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="bar"><span style="width:${pct(c.shot)}%;background:var(--ok)"></span><span style="width:${pct(c.partial)}%;background:var(--warn)"></span></div>
+    <div class="legend"><span><i class="dot" style="background:var(--ok)"></i>צולם ${pct(c.shot)}%</span><span><i class="dot" style="background:var(--warn)"></i>חלקית ${pct(c.partial)}%</span><span><i class="dot" style="background:var(--none)"></i>לא צולם ${c.not_shot}</span></div>
+  </div>
+  <h2>מפת הסצנות לפי סדר התסריט</h2>
+  <div class="strip">${S.scenes.map(s=>`<div class="chip st-${effSt(s)}" data-scene="${s.num}" title="${esc(s.loc)}">${s.num}${bestFor(s.num).length?'<span class="star">★</span>':''}</div>`).join("")}</div>
+  <p class="chars" style="margin-top:8px">★ = נבחר טייק לעריכה · לחיצה על מספר פותחת את הסצנה</p>`;
+}
+
+function scenesView(){
+  const locs=[...new Set(S.scenes.map(s=>s.loc))];
+  const q=fScene.q.trim();
+  const rows=S.scenes.filter(s=>(fScene.st==="all"||(s.status||"not_shot")===fScene.st)&&(fScene.loc==="all"||s.loc===fScene.loc)&&(!q||[s.sum,s.loc,(s.chars||[]).join(" "),String(s.num)].join(" ").includes(q)));
+  return `
+  ${DB?`<div class="toolbar"><button class="btn" data-newtake="">+ טייק</button></div>`:""}
+  <div class="filters">
+    <input id="fq" placeholder="חיפוש: דמות, מילה, מספר…" value="${esc(fScene.q)}">
+    <select id="fst"><option value="all">כל הסטטוסים</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${fScene.st===k?"selected":""}>${v}</option>`).join("")}</select>
+    <select id="floc"><option value="all">כל הלוקיישנים</option>${locs.map(l=>`<option ${fScene.loc===l?"selected":""}>${esc(l)}</option>`).join("")}</select>
+    <span class="chars">${rows.length} סצנות</span>
+  </div>
+  <table><thead><tr><th>#</th><th>סצנה</th><th class="hide-sm">דמויות</th><th>סטטוס</th><th>טייק נבחר</th></tr></thead><tbody>
+  ${rows.map(s=>{const b=bestFor(s.num);return `<tr class="click" data-scene="${s.num}">
+    <td class="num">${s.num}</td>
+    <td><div style="font-weight:700">${slug(s)}</div><div class="chars">${esc(s.sum)}</div></td>
+    <td class="chars hide-sm">${esc((s.chars||[]).join(" · "))}</td>
+    <td>${effSt(s)==="planned"?'<span class="pill st-planned">מתוכנן היום</span>':pill(s.status)}${daysFor(s.num).length?`<div class="chars">יום ${daysFor(s.num).join(", ")}</div>`:""}</td>
+    <td class="best">${b.map(takeLabel).join(", ")||'<span class="chars">—</span>'}</td></tr>`}).join("") || `<tr><td colspan="5" class="empty">אין תוצאות</td></tr>`}
+  </tbody></table>`;
+}
+
+function daysView(){
+  const tb=DB?`<div class="toolbar"><button class="btn" data-newtake="">+ טייק</button><button class="btn2" data-newday="1">+ יום צילום</button></div>`:"";
+  if(!S.days.length) return tb+ `<div class="card empty">עוד אין ימי צילום. שלחו לי בצ'אט את דוח היום (סצנות + טייקים והערות) ואעדכן כאן.</div>`;
+  return tb+[...S.days].sort((a,b)=>b.day-a.day).map(d=>{
+    const tk=S.takes.filter(t=>Number(t.day)===Number(d.day));
+    return `<div class="card day">
+      ${DB?`<button class="ebtn" style="float:left" data-eday="${esc(d._id)}">✎ עריכת יום</button>`:""}<h3>יום צילום ${esc(d.day)}${d.date?` · <span class="mono" style="font-size:14px">${esc(d.date)}</span>`:""} ${d.wip?'<span class="pill st-partial">בתהליך</span>':""} ${d.provisional?'<span class="pill st-not_shot">זמני — לאישור</span>':""}</h3>
+      <div class="meta">${(d.scenes||[]).length} סצנות · ${tk.length} טייקים מתועדים${d.location?` · ${esc(d.location)}`:""}</div>
+      <div class="scenes-line">${(d.scenes||[]).map(x=>`<span class="chip st-${x.status||"shot"}" data-scene="${x.num}">${esc(x.num)}${x.status==="partial"?" (חלקי)":""}${x.card?` <span style="font-weight:400;font-size:11px">· ${esc(x.card)}</span>`:""}</span>`).join("")}</div>
+      ${(d.planned||[]).length?`<div class="scenes-line"><span class="chars">מתוכנן:</span>${d.planned.map(n=>`<span class="chip st-planned" data-scene="${n}">${n}</span>`).join("")}${d.plannedCard?`<span class="chars">כרטיס ${esc(d.plannedCard)}</span>`:""}</div>`:""}
+      ${d.notes?`<div style="margin-bottom:10px">${esc(d.notes)}</div>`:""}
+      ${tk.length?takesTable(tk,true):""}
+    </div>`}).join("");
+}
+
+function takesTable(tk,showScene){
+  return `<table><thead><tr>${showScene?"<th>סצנה</th>":"<th>יום</th>"}<th>סטאפ / טייק</th><th>TC</th><th>הערות ביצוע</th><th></th></tr></thead><tbody>
+  ${tk.map(t=>`<tr><td class="num">${showScene?esc(t.scene):esc(t.day)}</td><td><div style="font-weight:700">${takeLabel(t)}</div>${takeMeta(t)?`<div class="chars">${takeMeta(t)}</div>`:""}</td><td class="mono">${esc(t.tc||"")}</td><td>${esc(t.note||"")}</td><td>${t.best?'<span class="pill" style="background:var(--accent-soft);color:var(--best)">★ לעריכה</span>':t.circled?'<span class="pill st-shot">מסומן</span>':""}${DB?`<button class="ebtn" data-etake="${esc(t._id)}" title="עריכה">✎</button>`:""}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function editorView(){
+  const rows=S.scenes.filter(s=>bestFor(s.num).length);
+  if(!rows.length) return `<div class="card empty">עוד לא נבחרו טייקים. כשתשלחו הערות על הטייק הטוב ביותר, הוא יופיע כאן לפי סדר התסריט — רשימת אסמבלי לעורך.</div>`;
+  const txt=rows.map(s=>`סצנה ${s.num} — ${s.ie}. ${s.loc}:\n`+(s.editorNote?`  ⚠ הערה לעורך: ${s.editorNote}\n`:"")+bestFor(s.num).map(t=>`  • ${t.setup?t.setup+" · ":""}T${t.take}${t.cam?" (מצ' "+t.cam+")":""}${t.part?" · חלק "+t.part:""} · יום ${t.day}${t.card?" · כרטיס "+t.card:""}${t.tc?" · TC "+t.tc:""}${t.note?" — "+t.note:""}`).join("\n")).join("\n");
+  window.__editorTxt=txt;
+  return `<div class="filters"><button class="btn" id="copyEd">העתק רשימה</button><span class="chars" id="copyMsg">${rows.length} סצנות עם בחירה · לפי סדר התסריט</span></div>
+  <table><thead><tr><th>#</th><th>סצנה</th><th>טייק נבחר</th><th>למה (ביצוע)</th></tr></thead><tbody>
+  ${rows.map(s=>bestFor(s.num).map((t,i)=>`<tr class="click" data-scene="${s.num}">${i===0?`<td class="num" rowspan="${bestFor(s.num).length}">${s.num}</td><td rowspan="${bestFor(s.num).length}">${slug(s)}${s.editorNote?`<div class="note" style="background:var(--accent-soft);margin:8px 0 0;font-size:13px"><b>הערה לעורך:</b> ${esc(s.editorNote)}</div>`:""}</td>`:""}<td class="best">${takeLabel(t)}<div class="chars">יום ${esc(t.day)}${t.tc?` · TC <span class="mono">${esc(t.tc)}</span>`:""}${takeMeta(t)?" · "+takeMeta(t):""}</div></td><td>${esc(t.note||"")}</td></tr>`).join("")).join("")}
+  </tbody></table>`;
+}
+
+function openScene(n){
+  const s=S.scenes.find(x=>Number(x.num)===Number(n)); if(!s) return;
+  const tk=takesFor(n);
+  document.getElementById("dlgTitle").innerHTML=`<div class="kicker">סצנה ${s.num}</div><div style="font-size:20px;font-weight:900">${slug(s)}</div>`;
+  document.getElementById("dlgBody").innerHTML=`
+    <p style="margin-top:0">${esc(s.sum)}</p>
+    <p class="chars"><b>דמויות:</b> ${esc((s.chars||[]).map(castName).join(" · "))}</p>
+    <p>${pill(s.status)} ${daysFor(n).length?`<span class="chars">· צולם ביום ${daysFor(n).join(", ")}</span>`:""}</p>
+    ${s.remarks?`<div class="note">${esc(s.remarks)}</div>`:""}
+    ${s.editorNote?`<div class="note" style="background:var(--accent-soft)"><b>הערה לעורך:</b> ${esc(s.editorNote)}</div>`:""}
+    ${s.cont?`<h2 style="margin-top:14px">המשכיות</h2>${contBlock(s)}`:""}
+    <h2 style="margin-top:14px">טייקים</h2>
+    ${tk.length?takesTable(tk,false):'<p class="chars">אין טייקים מתועדים.</p>'}
+    ${DB?`<div class="actions"><button class="btn" data-newtake="${s.num}">+ טייק לסצנה ${s.num}</button></div>
+    <h2>עדכון סצנה</h2><div class="form">
+      <label>סטטוס<select id="es_st">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${(s.status||"not_shot")===k?"selected":""}>${v}</option>`).join("")}</select></label>
+      <label class="wide">הערות (כיסוי, ברייקדאון…)<textarea id="es_rem" rows="2">${esc(s.remarks||"")}</textarea></label>
+      <label class="wide">הערה לעורך<textarea id="es_ed" rows="2">${esc(s.editorNote||"")}</textarea></label>
+      <label>המשכיות: תחילה · אביזרים<textarea id="ec_sp" rows="3">${esc((s.cont||{}).startProps||"")}</textarea></label>
+      <label>תחילה · אנרגיה וכיוונים<textarea id="ec_se" rows="3">${esc((s.cont||{}).startEnergy||"")}</textarea></label>
+      <label>סוף · אביזרים<textarea id="ec_ep" rows="3">${esc((s.cont||{}).endProps||"")}</textarea></label>
+      <label>סוף · אנרגיה וכיוונים<textarea id="ec_ee" rows="3">${esc((s.cont||{}).endEnergy||"")}</textarea></label>
+      <label class="wide">מה חסר<textarea id="ec_mi" rows="2">${esc((s.cont||{}).missing||"")}</textarea></label>
+      <label class="wide">לשים לב בצילום<textarea id="ec_pr" rows="2">${esc((s.cont||{}).prep||"")}</textarea></label>
+      <label>סימון המשכיות<select id="ec_fl"><option value="">—</option>${Object.entries(CF).map(([k,v])=>`<option value="${k}" ${(s.cont||{}).flag===k?"selected":""}>${v[0]}</option>`).join("")}</select></label>
+    </div><div class="actions"><button class="btn" id="es_save">שמירה</button><span class="err" id="es_msg"></span></div>`:""}`;
+  bindDlg(n);
+  dlg.showModal();
+}
+
+let DB=null;
+function dlgShow(title,html){document.getElementById("dlgTitle").innerHTML=title;document.getElementById("dlgBody").innerHTML=html;if(!dlg.open)dlg.showModal();}
+function val(id){const e=document.getElementById(id);return e?(e.type==="checkbox"?e.checked:e.value.trim()):""}
+function numOr(v){return v!==""&&!isNaN(Number(v))?Number(v):v}
+async function safe(fn,msgId){const m=document.getElementById(msgId);try{if(m)m.textContent="שומר…";await fn();if(m)m.textContent="נשמר ✓";return true}catch(e){if(m)m.textContent="השמירה נכשלה"+(e&&e.code==="invalid_argument"?" — אין הרשאת עריכה":"")+".";return false}}
+function lastDay(){return [...S.days].sort((a,b)=>b.day-a.day)[0]}
+function takeForm(t){
+  t=t||{}; const ld=lastDay();
+  const scOpts=S.scenes.map(s=>`<option value="${s.num}" ${Number(t.scene)===s.num?"selected":""}>${s.num} — ${esc(s.loc)}</option>`).join("");
+  const isNew=!t._id;
+  dlgShow(`<div class="kicker">${isNew?"טייק חדש":"עריכת טייק"}</div><div style="font-size:20px;font-weight:900">${isNew?"הוספת טייק":takeLabel(t)}</div>`,`
+  <div class="form">
+    <label>סצנה<select id="tf_scene">${scOpts}</select></label>
+    <label>יום צילום<input id="tf_day" type="number" min="1" value="${esc(t.day??(ld?ld.day:1))}"></label>
+    <label class="wide">סטאפ / שוט<input id="tf_setup" value="${esc(t.setup||"")}" placeholder="מאסטר, סינגל גור, סגורים…"></label>
+    <label>טייק<input id="tf_take" value="${esc(t.take??"")}" placeholder="3 / 3.2 / PU"></label>
+    <label>מצלמה<input id="tf_cam" value="${esc(t.cam||"")}" placeholder="A+B"></label>
+    <label>כרטיס<input id="tf_card" value="${esc(t.card||"")}" placeholder="A004/B004"></label>
+    <label>TC<input id="tf_tc" value="${esc(t.tc||"")}" placeholder="13:16"></label>
+    <label>חלק<input id="tf_part" value="${esc(t.part||"")}" placeholder="1/3"></label>
+    <label>ציון<input id="tf_rating" value="${esc(t.rating??"")}" placeholder="8.5"></label>
+    <label class="wide">הערות ביצוע<textarea id="tf_note" rows="3">${esc(t.note||"")}</textarea></label>
+    <label class="chk"><input type="checkbox" id="tf_best" ${t.best?"checked":""}> ★ נבחר לעריכה</label>
+    <label class="chk"><input type="checkbox" id="tf_circ" ${t.circled?"checked":""}> מסומן / שמיש</label>
+    ${isNew?`<label>סטטוס הסצנה<select id="tf_sst"><option value="">ללא שינוי</option><option value="shot">צולם</option><option value="partial">צולם חלקית</option></select></label>`:""}
+  </div>
+  <div class="actions"><button class="btn" id="tf_save">שמירה</button>${isNew?"":`<button class="btn2 btn-danger" id="tf_del">מחיקת טייק</button>`}<button class="btn2" onclick="dlg.close()">ביטול</button><span class="err" id="tf_msg"></span></div>`);
+  document.getElementById("tf_save").onclick=async()=>{
+    const scene=Number(val("tf_scene")), day=Number(val("tf_day"));
+    if(!scene||!day){document.getElementById("tf_msg").textContent="חסר מספר סצנה או יום.";return}
+    const data={scene,day,setup:val("tf_setup"),take:numOr(val("tf_take")),cam:val("tf_cam"),card:val("tf_card"),tc:val("tf_tc"),part:val("tf_part"),rating:numOr(val("tf_rating")),note:val("tf_note"),best:val("tf_best"),circled:val("tf_circ")};
+    Object.keys(data).forEach(k=>{if(data[k]==="")delete data[k]});
+    const id=t._id||`${scene}-d${day}-${Date.now().toString(36)}`;
+    const ok=await safe(()=>DB.collection("takes").doc(id).set(data),"tf_msg");
+    if(!ok) return;
+    if(isNew){
+      const sst=val("tf_sst"); const sc=S.scenes.find(s=>s.num===scene);
+      if(sst&&sc) await safe(()=>DB.collection("scenes").doc(sc._id).update({status:sst}),"tf_msg");
+      const d=S.days.find(d=>Number(d.day)===day);
+      if(d&&!(d.scenes||[]).some(x=>Number(x.num)===scene)){
+        const scenes=[...(d.scenes||[]),{num:scene,status:sst||"shot",...(data.card?{card:data.card}:{})}];
+        const planned=(d.planned||[]).filter(n=>Number(n)!==scene);
+        await safe(()=>DB.collection("days").doc(d._id).update({scenes,planned}),"tf_msg");
+      }
+    }
+    setTimeout(()=>dlg.close(),500);
+  };
+  const del=document.getElementById("tf_del");
+  if(del) del.onclick=async()=>{ if(del.dataset.sure){ if(await safe(()=>DB.collection("takes").doc(t._id).delete(),"tf_msg")) setTimeout(()=>dlg.close(),400);} else {del.dataset.sure=1;del.textContent="לחץ שוב לאישור מחיקה";} };
+}
+function dayForm(d){
+  d=d||{}; const isNew=!d._id; const nextNum=(lastDay()?.day||0)+1;
+  const rows=(d.scenes||[]).map(x=>dayRow(x)).join("");
+  dlgShow(`<div class="kicker">${isNew?"יום חדש":"עריכת יום"}</div><div style="font-size:20px;font-weight:900">יום צילום ${esc(d.day??nextNum)}</div>`,`
+  <div class="form">
+    <label>מספר יום<input id="df_day" type="number" min="1" value="${esc(d.day??nextNum)}" ${isNew?"":"disabled"}></label>
+    <label>תאריך<input id="df_date" value="${esc(d.date||"")}" placeholder="11.11.2026"></label>
+    <label class="chk"><input type="checkbox" id="df_wip" ${(isNew||d.wip)?"checked":""}> יום בתהליך</label>
+    <label>מתוכנן (מספרי סצנות)<input id="df_plan" value="${esc((d.planned||[]).join(", "))}" placeholder="14, 19"></label>
+    <label>כרטיס למתוכננות<input id="df_pcard" value="${esc(d.plannedCard||"")}"></label>
+    <label class="wide">הערות<textarea id="df_notes" rows="2">${esc(d.notes||"")}</textarea></label>
+  </div>
+  <h2>סצנות שצולמו ביום</h2><div class="chars" style="margin-bottom:6px">מספר · סטטוס · כרטיס</div>
+  <div id="df_rows">${rows}</div><button class="btn2" id="df_add">+ סצנה</button>
+  <div class="actions"><button class="btn" id="df_save">שמירה</button><button class="btn2" onclick="dlg.close()">ביטול</button><span class="err" id="df_msg"></span></div>`);
+  document.getElementById("df_add").onclick=()=>{document.getElementById("df_rows").insertAdjacentHTML("beforeend",dayRow({}));bindRows()};
+  bindRows();
+  document.getElementById("df_save").onclick=async()=>{
+    const day=Number(val("df_day")); if(!day){document.getElementById("df_msg").textContent="חסר מספר יום.";return}
+    const scenes=[...document.querySelectorAll("#df_rows .drow")].map(r=>({num:Number(r.querySelector(".r_n").value),status:r.querySelector(".r_s").value,card:r.querySelector(".r_c").value.trim()})).filter(x=>x.num).map(x=>{if(!x.card)delete x.card;return x});
+    const planned=val("df_plan").split(/[,\s]+/).map(Number).filter(Boolean);
+    const data={day,date:val("df_date"),wip:val("df_wip"),planned,plannedCard:val("df_pcard"),notes:val("df_notes"),scenes};
+    const id=d._id||`d${String(day).padStart(2,"0")}`;
+    if(isNew&&S.days.some(x=>x._id===id)){document.getElementById("df_msg").textContent="יום כזה כבר קיים.";return}
+    const ok=await safe(()=>isNew?DB.collection("days").doc(id).set(data):DB.collection("days").doc(id).update(data),"df_msg");
+    if(!ok) return;
+    for(const x of scenes){const sc=S.scenes.find(s=>s.num===x.num); if(sc&&(sc.status||"not_shot")==="not_shot"&&x.status!=="not_shot") await safe(()=>DB.collection("scenes").doc(sc._id).update({status:x.status}),"df_msg");}
+    setTimeout(()=>dlg.close(),500);
+  };
+}
+function dayRow(x){return `<div class="drow"><input class="r_n" type="number" min="1" max="${S.scenes.length}" value="${esc(x.num??"")}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"><select class="r_s" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"><option value="shot" ${x.status!=="partial"?"selected":""}>צולם</option><option value="partial" ${x.status==="partial"?"selected":""}>חלקית</option></select><input class="r_c" value="${esc(x.card||"")}" placeholder="A004/B004" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"><button class="ebtn r_x" title="הסרה">✕</button></div>`}
+function bindRows(){document.querySelectorAll("#df_rows .r_x").forEach(b=>b.onclick=()=>b.closest(".drow").remove())}
+function bindDlg(n){
+  bindEdit();
+  const b=document.getElementById("es_save"); if(!b) return;
+  const s=S.scenes.find(x=>Number(x.num)===Number(n));
+  b.onclick=()=>safe(()=>DB.collection("scenes").doc(s._id).update({status:val("es_st"),remarks:val("es_rem"),editorNote:val("es_ed"),cont:{startProps:val("ec_sp"),startEnergy:val("ec_se"),endProps:val("ec_ep"),endEnergy:val("ec_ee"),missing:val("ec_mi"),prep:val("ec_pr"),flag:val("ec_fl"),refs:(s.cont||{}).refs||[]}}),"es_msg");
+}
+function bindEdit(){
+  document.querySelectorAll("[data-etake]").forEach(el=>el.onclick=e=>{e.stopPropagation();takeForm(S.takes.find(t=>t._id===el.dataset.etake))});
+  document.querySelectorAll("[data-newtake]").forEach(el=>el.onclick=e=>{e.stopPropagation();takeForm(el.dataset.newtake?{scene:Number(el.dataset.newtake)}:{})});
+  document.querySelectorAll("[data-eday]").forEach(el=>el.onclick=e=>{e.stopPropagation();dayForm(S.days.find(d=>d._id===el.dataset.eday))});
+  document.querySelectorAll("[data-newday]").forEach(el=>el.onclick=e=>{e.stopPropagation();dayForm()});
+}
+function bind(){
+  bindEdit();
+  document.querySelectorAll("[data-scene]").forEach(el=>el.onclick=()=>openScene(el.dataset.scene));
+  document.querySelectorAll("[data-jump]").forEach(el=>el.onclick=e=>{e.preventDefault();const t=document.getElementById("sc-"+el.dataset.jump);if(t)t.scrollIntoView({behavior:"smooth"});});
+  document.querySelectorAll("a[data-scene]").forEach(el=>el.onclick=e=>{e.preventDefault();openScene(el.dataset.scene)});
+  const fq=document.getElementById("fq");
+  if(fq){ fq.oninput=e=>{fScene.q=e.target.value; const p=fq.selectionStart; render(); const n=document.getElementById("fq"); n.focus(); n.setSelectionRange(p,p);} ;
+    document.getElementById("fst").onchange=e=>{fScene.st=e.target.value;render()};
+    document.getElementById("floc").onchange=e=>{fScene.loc=e.target.value;render()}; }
+  const cb=document.getElementById("copyEd");
+  if(cb) cb.onclick=async()=>{try{await navigator.clipboard.writeText(window.__editorTxt);document.getElementById("copyMsg").textContent="הועתק ✓"}catch(e){document.getElementById("copyMsg").textContent="ההעתקה נחסמה בדפדפן"}};
+}
+window.addEventListener("hashchange",render);
+
+(async function init(){
+  render();
+  try{
+    const r=await fetch("data.json",{cache:"no-store"}); const d=await r.json();
+    const srt={scenes:(a,b)=>a.num-b.num,days:(a,b)=>a.day-b.day};
+    for(const k of ["scenes","days","takes","meta"]){S[k]=(d[k]||[]).sort(srt[k]||(()=>0));S.loaded[k]=true;}
+    S.note="תצוגה לקריאה בלבד · עודכן לאחרונה: "+(d.exported||"");
+  }catch(e){S.note="לא ניתן לטעון את הנתונים.";S.loaded.scenes=true;}
+  render();
+})();
+</script>
+</body>
+</html>
